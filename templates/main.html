@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?familzy=Jua&display=swap" rel="stylesheet">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="warp">
+    <header id="header">
+        <div id="header-wrap" class="">
+            <div class="container">
+                <div class="row">
+                    <!-- Logo
+                            ============================================= -->
+                    <div id="logo">
+                        <a href="index.html" class="standard-logo"><img src="../static/img/logo.png" alt="Logo"
+                                                                        style="height: 200px;"></a>
+                    </div>
+                    <!-- #logo end -->
+                    <div class="logout">
+                        <button class="btn">로그아웃</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="recommend">
+                <button class="btn  modal-btn" onclick="openModal('modal1')" >추천하기</button>
+            </div>
+        </div>
+        <div id="modal"></div>
+        <div class="modal-con modal1">
+            <a href="javascript:;" class="close">x</a>
+            <p class="title">url을 입력하세요</p>
+            <div class="con">
+                <input type="text">
+            </div>
+        </div>
+
+
+    </header>
+
+    <div class="content_area">
+        <div class="album_art"></div>
+        <div class="info_area">
+            <div class="song_name">노래제목</div>
+            <div class="singer">가수</div>
+        </div>
+        <div class="thumb_ud">
+            <div class="thumb_up">
+                <img src="../static/img/thumb_up.svg">
+                <div class="thumb_up_count">12</div>
+            </div>
+            <div class="thumb_down">
+                <img src="../static/img/thumb_down.svg">
+                <div class="thumb_down_count">3</div>
+            </div>
+        </div>
+    </div>
+    <div class="content_area">
+        <div class="album_art"></div>
+        <div class="info_area">
+            <div class="song_name">노래제목</div>
+            <div class="singer">가수</div>
+        </div>
+        <div class="thumb_ud">
+            <div class="thumb_up">
+                <img src="thumb_up.svg">
+                <div class="thumb_up_count">12</div>
+            </div>
+            <div class="thumb_down">
+                <img src="thumb_down.svg">
+                <div class="thumb_down_count">3</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function openModal(modalname){
+      document.get
+      $("#modal").fadeIn(300);
+      $("."+modalname).fadeIn(300);
+    }
+
+    $("#modal, .close").on('click',function(){
+      $("#modal").fadeOut(300);
+      $(".modal-con").fadeOut(300);
+    });
+
+</script>
+</body>
+</html>
