@@ -16,5 +16,5 @@ Jinha2 템플릿 엔진을 이용한 서버사이드 렌더링, JWT 인증 방�
 
 ## Member
 * [김연우](https://github.com/Yeonwoo-Kim)
-* [김진태](https://github.com/suzyrhkr)
+* [김진태](https://github.com/swcide)
 
