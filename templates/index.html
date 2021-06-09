@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
 
-     <script>
+    <script>
         //로그아웃
         function sign_out() {
             $.removeCookie('mytoken', {path: '/'});
@@ -132,20 +132,20 @@
                 ============================================= -->
                 {% for i in popular %}
 
-                    <div class="oc-item" data-animate="fadeInDown">
-                        <a>
-                            <img src="{{ i.albumArt }}" alt="Image 1">
-                        </a>
-                        <div class="bg-overlay">
-                            <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
-                                <div class="portfolio-desc py-0">
-                                    <h3><a href="#">{{ i.artist }}</a></h3>
-                                    <span><a href="#">{{ i.title }}</a></span>
-                                </div>
-
+                <div class="oc-item" data-animate="fadeInDown">
+                    <a>
+                        <img src="{{ i.albumArt }}" alt="Image 1">
+                    </a>
+                    <div class="bg-overlay">
+                        <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
+                            <div class="portfolio-desc py-0">
+                                <h3><a href="#">{{ i.artist }}</a></h3>
+                                <span><a href="#">{{ i.title }}</a></span>
                             </div>
+
                         </div>
                     </div>
+                </div>
                 {% endfor %}
 
 
@@ -167,6 +167,7 @@
                         ============================================= -->
                         {% for i in all %}
                         <div class="songs-list">
+
                             <div class="songs-number">{{ i._id }}</div>
                             <div class="songs-image track-image">
                                 <a href="detail/?_id={{ i._id }}" class="track-list">
@@ -190,17 +191,20 @@
                         <input type="hidden" value="{{ i.title }},{{ i.artist }}">
                         {% endfor %}
 
-
                     </div>
+
+
 
                 </div>
 
-                <div class="w-100 d-block d-md-block d-lg-none topmargin-lg clear"></div>
-
-
             </div>
 
+            <div class="w-100 d-block d-md-block d-lg-none topmargin-lg clear"></div>
+
+
         </div>
+
+    </div>
     </div>
 </section><!-- #content end -->
 
@@ -246,23 +250,24 @@
     }
 
     function update_like(obj) {
-        let arr = obj.split(',')
 
-        let title = arr[0]
-        let artist = arr[1]
+        let my_album = obj
+
+        console.log(my_album)
+
         $.ajax({
             type: 'POST',
             url: '/api/like',
             data: {
-                title_give: title,
-                artist_give: artist
+                // title_give: title,
+                // artist_give: artist
+                album_give: my_album
             },
             success: function (response) {
                 alert(response['msg']);
                 window.location.reload()
             }
         });
-
 
     }
 

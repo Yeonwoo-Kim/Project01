@@ -29,7 +29,6 @@ def home():
 
         return render_template("index.html", all=all, popular=popular)
 
-        #return render_template('index.html')
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
@@ -102,6 +101,7 @@ def main():
     popular = list(db.dbsparta_p1.find().sort('like', -1))
 
     return render_template("index.html", all=all, popular=popular)
+
 
 
 @app.route('/api/save_music', methods=['POST'])
