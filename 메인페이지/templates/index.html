@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href='../static/css/style.css' rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/music.css" type="text/css"/>
+    <link rel="stylesheet" href="../static/css/dark.css" type="text/css"/>
+    <link rel="stylesheet" href="../static/css/swiper.css" type="text/css"/>
+    <link rel="stylesheet" href="../static/css/font-icons.css" type="text/css"/>
+
+    <!--    <link rel="preconnect" href="https://fonts.gstatic.com">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+     <script>
+        //로그아웃
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+    </script>
+</head>
+<body class="stretched bg-color2 has-plugin-bootstrap" data-loader="4" data-loader-color="theme">
+<!-- Document Wrapper
+============================================= -->
+
+<header id="header" class="transparent-header dark header-size-custom" data-sticky-shrink="false"
+        data-sticky-class="semi-transparent">
+    <div id="header-wrap" class="">
+        <div class="container">
+            <div class="row alignright">
+
+                <!-- Logo
+                ============================================= -->
+                <!-- #logo end -->
+
+
+                <!-- Primary Navigation
+                ============================================= -->
+
+
+                <nav class="primary-menu not-dark col-lg-auto order-lg-3">
+
+                    <ul class="menu-container ">
+                        <li class="menu-item"><a class="menu-link" href="demo-writer-login.html">
+                            <div>Logout</div>
+                        </a></li>
+                    </ul>
+
+                </nav><!-- #primary-menu end -->
+
+            </div>
+        </div>
+    </div>
+    <div class="header-wrap-clone" style="height: 71px;"></div>
+</header>
+
+
+<!-- Slider============================================= -->
+<section id="slider" class="slider-element" style=" background: linear-gradient(70deg, #ff6bce, #578fff);">
+    <div class="container">
+        <div class="row" style="justify-content: center">
+            <div class="align-self-center flex-column py-6">
+                <div class="row inline-block">
+                    <div id="logo1">
+                        <a href="main">
+                            <img src="../static/img/logo.png" alt="Logo1"></a>
+                    </div>
+
+                    <div class="text-center" id="in-url">
+                        <a href="#" data-toggle="modal" data-target="#myModal"
+                           class="button button-border button-rounded button-fill button-aqua"
+                           style="background-color: rgba(333,333,333,0.7)"><span>추천하고 싶은 음악을 등록해보세요</span></a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade " id="myModal" tabindex="-1" aria-labelledby="myModalLabel" style="display: none ; "
+         aria-hidden="true">
+        <div class="modal-dialog modal-c">
+            <div class="modal-body">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <img src="../static/img/logo.png" style="width: 100px">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <input id="url" type="text" class="form-control" placeholder="url을 등록해주세요" style="width: 100%;">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button onclick="save_music()"
+                                class="button button-small button-circle button-border button-pink"></i>등록
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- Content
+============================================= -->
+<section id="content" class="bg-color2">
+
+    <div class="content-wrap py-0" style="overflow: visible;">
+        <div class="container clearfix" style="z-index: 7;">
+
+            <div class="heading-block bottommargin-sm border-0 dark">
+                <h3>Popular Songs</h3>
+
+            </div>
+
+            <!-- Carousel
+            ============================================= -->
+            <div id="oc-popular-songs" class="owl-carousel image-carousel carousel-widget" data-margin="20"
+                 data-nav="true" data-pagi="false" data-items-xs="2" data-items-sm="3" data-items-md="4"
+                 data-items-lg="6" data-items-xl="6">
+
+
+                <!-- Carousel Items 여기가 BEST 곡 모음
+                ============================================= -->
+                {% for i in popular %}
+
+                    <div class="oc-item" data-animate="fadeInDown">
+                        <a>
+                            <img src="{{ i.albumArt }}" alt="Image 1">
+                        </a>
+                        <div class="bg-overlay">
+                            <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
+                                <div class="portfolio-desc py-0">
+                                    <h3><a href="#">{{ i.artist }}</a></h3>
+                                    <span><a href="#">{{ i.title }}</a></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+
+            </div>
+            <hr>
+
+            <div class="row topmargin-lg clearfix">
+                <div class="col-lg-12">
+                    <div class="heading-block border-0 dark" style="margin-bottom: 15px;">
+                        <h3>All music</h3>
+
+                    </div>
+
+                    <!-- Song Lists Items
+                    ============================================= -->
+                    <div class="songs-lists-wrap">
+
+                        <!-- List Items
+                        ============================================= -->
+                        {% for i in all %}
+                            <div class="songs-list">
+                                <div class="songs-number">{{ i._id }}</div>
+                                <div class="songs-image track-image">
+                                    <a href="detail/?_id={{ i._id }}" class="track-list">
+                                        <img src="{{ i.albumArt }}"
+                                             alt="Image 1" style="width: 100px">
+                                    </a>
+                                </div>
+                                <div class="songs-name track-name">
+                                    <a href="#">{{ i.title }}
+                                        <br>
+                                        <span>{{ i.artist }}</span>
+                                    </a>
+                                </div>
+                                <div class="tumbs"><a a href='javascript:void(0)'
+                                                      onclick="update_like('{{ i.title }},{{ i.artist }}')">
+                                    <i class="i-plain icon-thumbs-up2"></i></a>
+                                        <span>{{ i.like }}</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" value="{{ i.title }},{{ i.artist }}">
+
+                            </div>
+                        {% endfor %}
+
+
+                    </div>
+
+                </div>
+
+                <div class="w-100 d-block d-md-block d-lg-none topmargin-lg clear"></div>
+
+
+            </div>
+
+        </div>
+    </div>
+</section><!-- #content end -->
+
+<!-- Footer
+============================================= -->
+<footer id="footer" class="border-0 dark" style="background-color: #111;">
+    <!-- Copyrights
+    ============================================= -->
+    <div id="copyrights" style="color: #444;">
+        <div class="container clearfix">
+
+            <div class="row justify-content-between col-mb-30">
+                <div class="col-12 col-lg-auto text-center text-lg-left">
+                    Copyrights &copy; 2020 All Rights Reserved by hansarang.
+                </div>
+
+            </div>
+
+        </div>
+    </div><!-- #copyrights end -->
+</footer><!-- #footer end -->
+
+</div><!-- #wrapper end -->
+<script src="../static/js/functions.js"></script>
+<script src="../static/js/plugins.min.js"></script>
+<script>
+    function save_music() {
+        let url = $("#url").val();
+
+        $.ajax({
+            type: "POST",
+            url: `/api/save_music`,
+            data: {
+                url_give: url
+            },
+            success: function (response) {
+                console.log('??')
+                alert(response["msg"])
+                window.location.reload()
+
+            }
+        });
+    }
+
+    function update_like(obj) {
+        let arr = obj.split(',')
+
+        let title = arr[0]
+        let artist = arr[1]
+        $.ajax({
+            type: 'POST',
+            url: '/api/like',
+            data: {
+                title_give: title,
+                artist_give: artist
+            },
+            success: function (response) {
+                alert(response['msg']);
+                window.location.reload()
+            }
+        });
+
+
+    }
+
+</script>
+
+</body>
+</html>
