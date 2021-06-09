@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-import pymongo
 import jwt
 import requests
 from bs4 import BeautifulSoup
@@ -30,7 +29,7 @@ def home():
 
         return render_template("index.html", all=all, popular=popular)
 
-        # return render_template('index.html')
+        #return render_template('index.html')
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
@@ -88,7 +87,6 @@ def check_dup():
     exists = bool(db.users.find_one({"username": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
 
-
 # --------------------main page----------------------------------
 
 @app.route('/main')
@@ -102,7 +100,7 @@ def main():
     # print(result)
     all = list(db.dbsparta_p1.find())
     popular = list(db.dbsparta_p1.find().sort('like', -1))
-    
+
     return render_template("index.html", all=all, popular=popular)
 
 
@@ -127,8 +125,7 @@ def save_music():
     soup = BeautifulSoup(data.text, 'html.parser')
 
     title = soup.select_one('#body-content > div.album-detail-infos > div.info-zone >h2').text
-    artist = soup.select_one(
-        '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(1) > span.value > a').text
+    artist = soup.select_one('#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(1) > span.value > a').text
 
     albumArt = soup.select_one('#body-content > div.album-detail-infos > div.photo-zone > a > span.cover > img')['src']
     print(title)
@@ -152,15 +149,13 @@ def save_music():
 
     return jsonify({'result': 'success', 'msg': f'word "{artist}" saved'})
 
-
 @app.route('/api/like', methods=['POST'])
 def like_music():
+    title_receive = request.form['title_give']
+    artist_receive = request.form['artist_give']
 
-    album_receive = request.form['album_give']
-    target_music = db.dbsparta_p1.find_one({'albumArt': album_receive})
-
-    print(target_music)
-
+    target_music = db.dbsparta_p1.find_one({'artist': artist_receive, 'title': title_receive})
+    print(target_music['_id'])
     current_like = target_music['like']
 
     new_like = current_like + 1
@@ -168,7 +163,6 @@ def like_music():
     db.dbsparta_p1.update_one({'_id': target_music['_id']}, {'$set': {'like': new_like}})
 
     return jsonify({'msg': '좋아요 완료!'})
-
 
 # ---------------------main page-----------------------------
 
