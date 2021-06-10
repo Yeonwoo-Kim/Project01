@@ -1,3 +1,4 @@
+import pymongo
 from pymongo import MongoClient
 import jwt
 import requests
@@ -23,11 +24,12 @@ def home():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
 
-        all = list(db.dbsparta_p1.find())
-        popular = list(db.dbsparta_p1.find().sort('like', -1))
+        all = list(db.music.find().sort('mId', -1))
+        popular = list(db.music.find().sort('like', -1))
 
-        return render_template("index.html", all=all, popular=popular)
+        return render_template("index.html", all=all, popular=popular, user_info=user_info)
 
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
@@ -86,37 +88,34 @@ def check_dup():
     exists = bool(db.users.find_one({"username": username_receive}))
     return jsonify({'result': 'success', 'exists': exists})
 
+
 # --------------------main page----------------------------------
 
 @app.route('/main')
 def main():
-    # status_receive = request.args.get("status_give")
-    # print(status_receive)
-    #
-    # # API에서 단어 뜻 찾아서 결과 보내기
-    # r = requests.get(f"https://owlbot.info/api/v4/dictionary/{keyword}", headers={"Authorization": "Token 8d0d9d0e32a84ba7fdebc5040d4a3b77991aefb4"})
-    # result = r.json()
-    # print(result)
-    all = list(db.dbsparta_p1.find())
-    popular = list(db.dbsparta_p1.find().sort('like', -1))
+    all = list(db.music.find())
+    popular = list(db.music.find().sort('like', -1))
 
     return render_template("index.html", all=all, popular=popular)
-
 
 
 @app.route('/api/save_music', methods=['POST'])
 def save_music():
     #  저장하기
 
-    if db.dbsparta_p1.count_documents({}) == 0:
+    if db.music.count_documents({}) == 0:
         index = 1
     else:  # document 가 있으면
-        data = list(db.dbsparta_p1.find({}).sort('_id', pymongo.DESCENDING).limit(1))
+        data = list(db.music.find({}).sort('_id', pymongo.DESCENDING).limit(1))
         data1 = data[0]
-        index = data1['_id'] + 1
+        index = data1['mId'] + 1
+
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.users.find_one({"username": payload["id"]})
+    writer = user_info['username']
 
     url_receive = request.form["url_give"]
-    print('url_receive?', url_receive)
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
@@ -125,44 +124,161 @@ def save_music():
     soup = BeautifulSoup(data.text, 'html.parser')
 
     title = soup.select_one('#body-content > div.album-detail-infos > div.info-zone >h2').text
-    artist = soup.select_one('#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(1) > span.value > a').text
+    artist = soup.select_one(
+        '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(1) > span.value > a').text
 
     albumArt = soup.select_one('#body-content > div.album-detail-infos > div.photo-zone > a > span.cover > img')['src']
-    print(title)
-    test = db.dbsparta_p1.find_one({'title': title}, {'artist': artist})
 
-    print(test, 'test')
+    genre = soup.select_one(
+        '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(2) > span.value').text
+    release_date = soup.select_one(
+        '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(5) > span.value').text
+    check = db.dbsparta_p1.find_one({'title': title}, {'artist': artist})
 
     doc = {
-        '_id': index,
+        'mId': index,
         'title': title,
         'artist': artist,
         "albumArt": albumArt,
-        'like': 0
+        'like': 0,
+        'url': url_receive,
+        'writer': writer,
+        'genre': genre,
+        'release_date': release_date,
+
 
     }
 
-    if test:
-        print('lololo')
+    if check:
+        return jsonify({'result': 'success', 'msg': f' "{title}" 은 이미 있는 곡입니다!'})
     else:
-        db.dbsparta_p1.insert_one(doc)
+        db.music.insert_one(doc)
+        return jsonify({'result': 'success', 'msg': f' "{artist}" 의 곡이 저장 완료되었습니다!'})
 
-    return jsonify({'result': 'success', 'msg': f'word "{artist}" saved'})
 
 @app.route('/api/like', methods=['POST'])
 def like_music():
-    title_receive = request.form['title_give']
-    artist_receive = request.form['artist_give']
-
-    target_music = db.dbsparta_p1.find_one({'artist': artist_receive, 'title': title_receive})
-    print(target_music['_id'])
+    album_receive = request.form['album_give']
+    target_music = db.music.find_one({'albumArt': album_receive})
     current_like = target_music['like']
 
     new_like = current_like + 1
 
-    db.dbsparta_p1.update_one({'_id': target_music['_id']}, {'$set': {'like': new_like}})
+    db.music.update_one({'_id': target_music['_id']}, {'$set': {'like': new_like}})
 
     return jsonify({'msg': '좋아요 완료!'})
+
+
+
+@app.route('/api/delete_music', methods=['POST'])
+def delete_word():
+    # 단어 삭제하기
+    target_music = request.form['album_give']
+    db.music.delete_one({"albumArt":target_music})
+    return jsonify({'result': 'success', 'msg': f'word "{target_music}" deleted'})
+
+
+'''--------------------------------------------------------------------'''
+
+@app.route('/detail')
+def detail():
+    token_receive = request.cookies.get('mytoken')
+
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.users.find_one({"username": payload["id"]})
+
+    mId = int(request.args.get("mId"))
+
+    target_music = db.music.find_one({'mId': mId})
+
+    return render_template("detail.html", doc=target_music,user_info=user_info)
+
+
+@app.route('/posting', methods=['POST'])
+def posting():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        # 포스팅하기
+        user_info = db.users.find_one({"username": payload["id"]})
+        comment_receive = request.form["comment_give"]
+        date_receive = request.form["date_give"]
+        mId = int(request.form["mId"])
+        print(type(date_receive))
+        doc = {
+            "username": user_info["username"],
+            "profile_name": user_info["profile_name"],
+            "profile_pic_real": user_info["profile_pic_real"],
+            "comment": comment_receive,
+            "date": date_receive,
+            "mId": mId
+        }
+        db.posts.insert_one(doc)
+        return jsonify({"result": "success", 'msg': '포스팅 성공'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+@app.route("/get_posts", methods=['GET'])
+def get_posts():
+
+    mId = int(request.args.get("mId"))
+    print(mId)
+
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        my_username = payload["id"]
+
+        target_music = db.music.find_one({'mId': mId})
+        print(target_music)
+        posts = list(db.posts.find({'mId': mId}).sort("date", -1).limit(20))
+
+        print(posts)
+        for post in posts:
+            post["_id"] = str(post["_id"])
+
+            post["count_heart"] = db.likes.count_documents({"post_id": post["_id"], "type": "heart"})
+            post["heart_by_me"] = bool(
+                db.likes.find_one({"post_id": post["_id"], "type": "heart", "username": my_username}))
+
+            post["count_star"] = db.likes.count_documents({"post_id": post["_id"], "type": "star"})
+            post["star_by_me"] = bool(
+                db.likes.find_one({"post_id": post["_id"], "type": "star", "username": my_username}))
+
+            post["count_like"] = db.likes.count_documents({"post_id": post["_id"], "type": "like"})
+            post["like_by_me"] = bool(
+                db.likes.find_one({"post_id": post["_id"], "type": "like", "username": my_username}))
+
+        return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "posts": posts})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+@app.route('/update_like', methods=['POST'])
+def update_like():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        # 좋아요 수 변경
+        user_info = db.users.find_one({"username": payload["id"]})
+        post_id_receive = request.form["post_id_give"]
+        type_receive = request.form["type_give"]
+        action_receive = request.form["action_give"]
+        doc = {
+            "post_id": post_id_receive,
+            "username": user_info["username"],
+            "type": type_receive
+        }
+        if action_receive =="like":
+            db.likes.insert_one(doc)
+        else:
+            db.likes.delete_one(doc)
+        count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})
+        print(count)
+        return jsonify({"result": "success", 'msg': 'updated', "count": count})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 # ---------------------main page-----------------------------
 

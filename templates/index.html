@@ -33,16 +33,7 @@
     <div id="header-wrap" class="">
         <div class="container">
             <div class="row alignright">
-
-                <!-- Logo
-                ============================================= -->
-                <!-- #logo end -->
-
-
-                <!-- Primary Navigation
-                ============================================= -->
-
-
+                {{ user_info.username }}
                 <nav class="primary-menu not-dark col-lg-auto order-lg-3">
 
                     <ul class="menu-container ">
@@ -132,20 +123,20 @@
                 ============================================= -->
                 {% for i in popular %}
 
-                <div class="oc-item" data-animate="fadeInDown">
-                    <a>
-                        <img src="{{ i.albumArt }}" alt="Image 1">
-                    </a>
-                    <div class="bg-overlay">
-                        <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
-                            <div class="portfolio-desc py-0">
-                                <h3><a href="#">{{ i.artist }}</a></h3>
-                                <span><a href="#">{{ i.title }}</a></span>
-                            </div>
+                    <div class="oc-item" data-animate="fadeInDown">
+                        <a>
+                            <img src="{{ i.albumArt }}" alt="Image 1">
+                        </a>
+                        <div class="bg-overlay">
+                            <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
+                                <div class="portfolio-desc py-0">
+                                    <h3><a href="#">{{ i.artist }}</a></h3>
+                                    <span><a href="#">{{ i.title }}</a></span>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
                 {% endfor %}
 
 
@@ -166,45 +157,44 @@
                         <!-- List Items
                         ============================================= -->
                         {% for i in all %}
-                        <div class="songs-list">
 
-                            <div class="songs-number">{{ i._id }}</div>
-                            <div class="songs-image track-image">
-                                <a href="detail/?_id={{ i._id }}" class="track-list">
-                                    <img src="{{ i.albumArt }}"
-                                         alt="Image 1" style="width: 100px">
-                                </a>
-                            </div>
-                            <div class="songs-name track-name">
-                                <a href="#">{{ i.title }}
-                                    <br>
-                                    <span>{{ i.artist }}</span>
-                                </a>
-                            </div>
-                            <div class="tumbs"><a href='javascript:void(0)'
-                                                  onclick="update_like('{{i.albumArt}}')">
+                            <div class="songs-list">
 
-                                <i class="i-plain icon-thumbs-up2"></i></a>
-                                <span>{{ i.like }}</span>
+                                <div class="songs-number">{{ i.mId }}</div>
+                                <div class="songs-image track-image">
+                                    <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})" class="track-list">
+                                        <img src="{{ i.albumArt }}" alt="Image 1" style="width: 100px">
+                                    </a>
+                                </div>
+                                <div class="songs-name track-name">
+                                    <a href="#">{{ i.title }}
+                                        <br>
+                                        <span>{{ i.artist }}</span>
+                                    </a>
+                                </div>
+                                <div class="col-mb-2">
+                                    <div class="tumbs"><a href='javascript:void(0)'
+                                                          onclick="update_like('{{ i.albumArt }}')">
+                                        <i class="i-plain icon-thumbs-up2"></i></a>
+                                        <span>{{ i.like }}</span>
+                                    </div>
+                                    {% if i.writer == user_info.username %}
+                                        <div class="delete"><a href='javascript:void(0)'
+                                                               onclick="delete_music('{{ i.albumArt }}')">
+                                            <span><i class="icon-line-trash"></i></span></a>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                        <input type="hidden" value="{{ i.title }},{{ i.artist }}">
                         {% endfor %}
-
                     </div>
-
-
-
                 </div>
+                <div class="w-100 d-block d-md-block d-lg-none topmargin-lg clear"></div>
+
 
             </div>
 
-            <div class="w-100 d-block d-md-block d-lg-none topmargin-lg clear"></div>
-
-
         </div>
-
-    </div>
     </div>
 </section><!-- #content end -->
 
@@ -234,6 +224,7 @@
     function save_music() {
         let url = $("#url").val();
 
+
         $.ajax({
             type: "POST",
             url: `/api/save_music`,
@@ -259,8 +250,6 @@
             type: 'POST',
             url: '/api/like',
             data: {
-                // title_give: title,
-                // artist_give: artist
                 album_give: my_album
             },
             success: function (response) {
@@ -269,6 +258,29 @@
             }
         });
 
+    }
+
+    function to_detail(mId) {
+        alert(mId)
+        window.open('/detail?mId=' + mId, '한사랑음악회', 'width=1100px,height=800px,scrollbars=yes,resizable=no')
+
+
+    }
+
+    function delete_music(obj) {
+
+        let my_album = obj
+        $.ajax({
+            type: "POST",
+            url: `/api/delete_music`,
+            data: {
+                album_give: my_album,
+            },
+            success: function (response) {
+                alert(response["msg"])
+                window.location.href = "/"
+            }
+        });
     }
 
 </script>
