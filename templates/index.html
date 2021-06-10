@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../static/css/dark.css" type="text/css"/>
     <link rel="stylesheet" href="../static/css/swiper.css" type="text/css"/>
     <link rel="stylesheet" href="../static/css/font-icons.css" type="text/css"/>
+    <link rel="stylesheet" href="../static/css/forum.css" type="text/css"/>
 
     <!--    <link rel="preconnect" href="https://fonts.gstatic.com">-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -33,21 +34,35 @@
     <div id="header-wrap" class="">
         <div class="container">
             <div class="row alignright">
-                {{ user_info.username }}
+
+
                 <nav class="primary-menu not-dark col-lg-auto order-lg-3">
 
+
+
                     <ul class="menu-container ">
+
+
                         <li class="menu-item"><a class="menu-link" onclick="sign_out()">
+
                             <div>Logout</div>
                         </a></li>
+
                     </ul>
 
                 </nav><!-- #primary-menu end -->
-
+                <div id="primary-menu-trigger">
+                    <svg class="svg-trigger" viewBox="0 0 100 100">
+                        <path d="m 30,33 h 40 c 3.722839,0 7.5,3.126468 7.5,8.578427 0,5.451959 -2.727029,8.421573 -7.5,8.421573 h -20"></path>
+                        <path d="m 30,50 h 40"></path>
+                        <path d="m 70,67 h -40 c 0,0 -7.5,-0.802118 -7.5,-8.365747 0,-7.563629 7.5,-8.634253 7.5,-8.634253 h 20"></path>
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
     <div class="header-wrap-clone" style="height: 71px;"></div>
+    <div id="gotoTop" class="icon-angle-up"></div>
 </header>
 
 
@@ -58,8 +73,8 @@
             <div class="align-self-center flex-column py-6">
                 <div class="row inline-block">
                     <div id="logo1">
-                        <a href="main">
-                            <img src="../static/img/logo.png" alt="Logo1"></a>
+
+                            <img src="../static/img/logo.png" alt="Logo1">
                     </div>
 
                     <div class="text-center" id="in-url">
@@ -130,8 +145,10 @@
                         <div class="bg-overlay">
                             <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
                                 <div class="portfolio-desc py-0">
-                                    <h3><a href="#">{{ i.artist }}</a></h3>
-                                    <span><a href="#">{{ i.title }}</a></span>
+                                    <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})">
+                                        <h3>{{ i.artist }}</h3>
+                                         <span>{{ i.title }}</span>
+                                    </a>
                                 </div>
 
                             </div>
@@ -167,20 +184,20 @@
                                     </a>
                                 </div>
                                 <div class="songs-name track-name">
-                                    <a href="#">{{ i.title }}
+                                    <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})" >{{ i.title }}
                                         <br>
                                         <span>{{ i.artist }}</span>
                                     </a>
                                 </div>
                                 <div class="col-mb-2">
                                     <div class="tumbs"><a href='javascript:void(0)'
-                                                          onclick="update_like('{{ i.albumArt }}')">
+                                                          onclick="update_like('{{ i.mId }}')">
                                         <i class="i-plain icon-thumbs-up2"></i></a>
                                         <span>{{ i.like }}</span>
                                     </div>
                                     {% if i.writer == user_info.username %}
                                         <div class="delete"><a href='javascript:void(0)'
-                                                               onclick="delete_music('{{ i.albumArt }}')">
+                                                               onclick="delete_music('{{ i.mId }}')">
                                             <span><i class="icon-line-trash"></i></span></a>
                                         </div>
                                     {% endif %}
@@ -242,15 +259,15 @@
 
     function update_like(obj) {
 
-        let my_album = obj
+        let index = obj
 
-        console.log(my_album)
+        console.log(index)
 
         $.ajax({
             type: 'POST',
             url: '/api/like',
             data: {
-                album_give: my_album
+                index_give: index
             },
             success: function (response) {
                 alert(response['msg']);
@@ -269,12 +286,14 @@
 
     function delete_music(obj) {
 
-        let my_album = obj
+        let index = obj
+
+
         $.ajax({
             type: "POST",
             url: `/api/delete_music`,
             data: {
-                album_give: my_album,
+                index_give: index,
             },
             success: function (response) {
                 alert(response["msg"])

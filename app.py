@@ -133,7 +133,7 @@ def save_music():
         '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(2) > span.value').text
     release_date = soup.select_one(
         '#body-content > div.album-detail-infos > div.info-zone > ul > li:nth-child(5) > span.value').text
-    check = db.dbsparta_p1.find_one({'title': title}, {'artist': artist})
+    check = db.music.find_one({'title': title}, {'artist': artist})
 
     doc = {
         'mId': index,
@@ -158,8 +158,9 @@ def save_music():
 
 @app.route('/api/like', methods=['POST'])
 def like_music():
-    album_receive = request.form['album_give']
-    target_music = db.music.find_one({'albumArt': album_receive})
+    index_receive = int(request.form['index_give'])
+    print(type(index_receive))
+    target_music = db.music.find_one({'mId':index_receive})
     current_like = target_music['like']
 
     new_like = current_like + 1
@@ -171,10 +172,16 @@ def like_music():
 
 
 @app.route('/api/delete_music', methods=['POST'])
-def delete_word():
+def delete_music():
     # 단어 삭제하기
-    target_music = request.form['album_give']
-    db.music.delete_one({"albumArt":target_music})
+
+
+    target_music = int(request.form['index_give'])
+
+    db.music.delete_one({"mId":target_music})
+    d = list(db.posts.remove({'mId':target_music}))
+
+
     return jsonify({'result': 'success', 'msg': f'word "{target_music}" deleted'})
 
 
