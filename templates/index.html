@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../static/css/dark.css" type="text/css"/>
     <link rel="stylesheet" href="../static/css/swiper.css" type="text/css"/>
     <link rel="stylesheet" href="../static/css/font-icons.css" type="text/css"/>
-    <link rel="stylesheet" href="../static/css/forum.css" type="text/css"/>
 
     <!--    <link rel="preconnect" href="https://fonts.gstatic.com">-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -19,8 +18,12 @@
     <script>
         //로그아웃
         function sign_out() {
-            $.removeCookie('mytoken', {path: '/'});
-            alert('로그아웃!')
+            if (confirm('로그아웃 하시겠습니까?')) {
+                $.removeCookie('mytoken', {path: '/'});
+            } else {
+                return;
+            }
+
             window.location.href = "/login"
         }
     </script>
@@ -34,22 +37,12 @@
     <div id="header-wrap" class="">
         <div class="container">
             <div class="row alignright">
-
-
                 <nav class="primary-menu not-dark col-lg-auto order-lg-3">
-
-
-
                     <ul class="menu-container ">
-
-
                         <li class="menu-item"><a class="menu-link" onclick="sign_out()">
-
                             <div>Logout</div>
                         </a></li>
-
                     </ul>
-
                 </nav><!-- #primary-menu end -->
                 <div id="primary-menu-trigger">
                     <svg class="svg-trigger" viewBox="0 0 100 100">
@@ -62,7 +55,6 @@
         </div>
     </div>
     <div class="header-wrap-clone" style="height: 71px;"></div>
-    <div id="gotoTop" class="icon-angle-up"></div>
 </header>
 
 
@@ -138,22 +130,21 @@
                 ============================================= -->
                 {% for i in popular %}
 
-                    <div class="oc-item" data-animate="fadeInDown">
-                        <a>
-                            <img src="{{ i.albumArt }}" alt="Image 1">
-                        </a>
-                        <div class="bg-overlay">
-                            <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
-                                <div class="portfolio-desc py-0">
-                                    <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})">
-                                        <h3>{{ i.artist }}</h3>
-                                         <span>{{ i.title }}</span>
-                                    </a>
-                                </div>
-
+                <div class="oc-item" data-animate="fadeInDown">
+                    <a>
+                        <img src="{{ i.albumArt }}" alt="Image 1">
+                    </a>
+                    <div class="bg-overlay">
+                        <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
+                            <div class="portfolio-desc py-0">
+                                <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})">
+                                    <h3>{{ i.artist }}</h3>
+                                    <span>{{ i.title }}</span>
+                                </a>
                             </div>
                         </div>
                     </div>
+                </div>
                 {% endfor %}
 
 
@@ -239,22 +230,28 @@
 <script src="../static/js/plugins.min.js"></script>
 <script>
     function save_music() {
-        let url = $("#url").val();
+
+        if(confirm("해당 곡을 저장할까요?")) {
+            let url = $("#url").val();
 
 
-        $.ajax({
-            type: "POST",
-            url: `/api/save_music`,
-            data: {
-                url_give: url
-            },
-            success: function (response) {
-                console.log('??')
-                alert(response["msg"])
-                window.location.reload()
+            $.ajax({
+                type: "POST",
+                url: `/api/save_music`,
+                data: {
+                    url_give: url
+                },
+                success: function (response) {
+                    console.log('??')
+                    alert(response["msg"])
+                    window.location.reload()
 
-            }
-        });
+                }
+            });
+        }
+        else{
+            return;
+        }
     }
 
     function update_like(obj) {
@@ -278,7 +275,7 @@
     }
 
     function to_detail(mId) {
-        alert(mId)
+        alert("곡에 대한 생각을 남겨주세요~!")
         window.open('/detail?mId=' + mId, '한사랑음악회', 'width=1100px,height=800px,scrollbars=yes,resizable=no')
 
 
@@ -286,20 +283,25 @@
 
     function delete_music(obj) {
 
-        let index = obj
+        if (confirm("해당 곡을 삭제하시겠어요?")) {
+            let my_album = obj
+            $.ajax({
+                type: "POST",
+                url: `/api/delete_music`,
+                data: {
+                    album_give: my_album,
+                },
+                success: function (response) {
+                    // alert("해당 곡을 삭제하시겠어요?")
+                    window.location.href = "/"
+                }
+            });
 
+        }
+        else{
+            return;
+        }
 
-        $.ajax({
-            type: "POST",
-            url: `/api/delete_music`,
-            data: {
-                index_give: index,
-            },
-            success: function (response) {
-                alert(response["msg"])
-                window.location.href = "/"
-            }
-        });
     }
 
 </script>
