@@ -18,8 +18,12 @@
     <script>
         //로그아웃
         function sign_out() {
-            $.removeCookie('mytoken', {path: '/'});
-            alert('로그아웃!')
+            if (confirm('로그아웃 하시겠습니까?')) {
+                $.removeCookie('mytoken', {path: '/'});
+            } else {
+                return;
+            }
+
             window.location.href = "/login"
         }
     </script>
@@ -123,20 +127,20 @@
                 ============================================= -->
                 {% for i in popular %}
 
-                    <div class="oc-item" data-animate="fadeInDown">
-                        <a>
-                            <img src="{{ i.albumArt }}" alt="Image 1">
-                        </a>
-                        <div class="bg-overlay">
-                            <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
-                                <div class="portfolio-desc py-0">
-                                    <h3><a href="#">{{ i.artist }}</a></h3>
-                                    <span><a href="#">{{ i.title }}</a></span>
-                                </div>
-
+                <div class="oc-item" data-animate="fadeInDown">
+                    <a>
+                        <img src="{{ i.albumArt }}" alt="Image 1">
+                    </a>
+                    <div class="bg-overlay">
+                        <div class="bg-overlay-content text-overlay-mask dark desc-sm align-items-center justify-content-between">
+                            <div class="portfolio-desc py-0">
+                                <h3><a href="#">{{ i.artist }}</a></h3>
+                                <span><a href="#">{{ i.title }}</a></span>
                             </div>
+
                         </div>
                     </div>
+                </div>
                 {% endfor %}
 
 
@@ -158,34 +162,34 @@
                         ============================================= -->
                         {% for i in all %}
 
-                            <div class="songs-list">
+                        <div class="songs-list">
 
-                                <div class="songs-number">{{ i.mId }}</div>
-                                <div class="songs-image track-image">
-                                    <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})" class="track-list">
-                                        <img src="{{ i.albumArt }}" alt="Image 1" style="width: 100px">
-                                    </a>
-                                </div>
-                                <div class="songs-name track-name">
-                                    <a href="#">{{ i.title }}
-                                        <br>
-                                        <span>{{ i.artist }}</span>
-                                    </a>
-                                </div>
-                                <div class="col-mb-2">
-                                    <div class="tumbs"><a href='javascript:void(0)'
-                                                          onclick="update_like('{{ i.albumArt }}')">
-                                        <i class="i-plain icon-thumbs-up2"></i></a>
-                                        <span>{{ i.like }}</span>
-                                    </div>
-                                    {% if i.writer == user_info.username %}
-                                        <div class="delete"><a href='javascript:void(0)'
-                                                               onclick="delete_music('{{ i.albumArt }}')">
-                                            <span><i class="icon-line-trash"></i></span></a>
-                                        </div>
-                                    {% endif %}
-                                </div>
+                            <div class="songs-number"></div>
+                            <div class="songs-image track-image">
+                                <a href="javascript:void(0)" onclick="to_detail({{ i.mId }})" class="track-list">
+                                    <img src="{{ i.albumArt }}" alt="Image 1" style="width: 100px">
+                                </a>
                             </div>
+                            <div class="songs-name track-name">
+                                <a href="#">{{ i.title }}
+                                    <br>
+                                    <span>{{ i.artist }}</span>
+                                </a>
+                            </div>
+                            <div class="col-mb-2">
+                                <div class="tumbs"><a href='javascript:void(0)'
+                                                      onclick="update_like('{{ i.albumArt }}')">
+                                    <i class="i-plain icon-thumbs-up2"></i></a>
+                                    <span>{{ i.like }}</span>
+                                </div>
+                                {% if i.writer == user_info.username %}
+                                <div class="delete"><a href='javascript:void(0)'
+                                                       onclick="delete_music('{{ i.albumArt }}')">
+                                    <span><i class="icon-line-trash"></i></span></a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -222,22 +226,28 @@
 <script src="../static/js/plugins.min.js"></script>
 <script>
     function save_music() {
-        let url = $("#url").val();
+
+        if(confirm("해당 곡을 저장할까요?")) {
+            let url = $("#url").val();
 
 
-        $.ajax({
-            type: "POST",
-            url: `/api/save_music`,
-            data: {
-                url_give: url
-            },
-            success: function (response) {
-                console.log('??')
-                alert(response["msg"])
-                window.location.reload()
+            $.ajax({
+                type: "POST",
+                url: `/api/save_music`,
+                data: {
+                    url_give: url
+                },
+                success: function (response) {
+                    console.log('??')
+                    alert(response["msg"])
+                    window.location.reload()
 
-            }
-        });
+                }
+            });
+        }
+        else{
+            return;
+        }
     }
 
     function update_like(obj) {
@@ -261,7 +271,7 @@
     }
 
     function to_detail(mId) {
-        alert(mId)
+        alert("곡에 대한 생각을 남겨주세요~!")
         window.open('/detail?mId=' + mId, '한사랑음악회', 'width=1100px,height=800px,scrollbars=yes,resizable=no')
 
 
@@ -269,18 +279,25 @@
 
     function delete_music(obj) {
 
-        let my_album = obj
-        $.ajax({
-            type: "POST",
-            url: `/api/delete_music`,
-            data: {
-                album_give: my_album,
-            },
-            success: function (response) {
-                alert(response["msg"])
-                window.location.href = "/"
-            }
-        });
+        if (confirm("해당 곡을 삭제하시겠어요?")) {
+            let my_album = obj
+            $.ajax({
+                type: "POST",
+                url: `/api/delete_music`,
+                data: {
+                    album_give: my_album,
+                },
+                success: function (response) {
+                    // alert("해당 곡을 삭제하시겠어요?")
+                    window.location.href = "/"
+                }
+            });
+
+        }
+        else{
+            return;
+        }
+
     }
 
 </script>
