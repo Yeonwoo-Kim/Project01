@@ -20,8 +20,6 @@
 * 비밀번호와 재입력 일치 여부 확인
 * SHA-256으로 비밀번호 암호화
 
-<p align="center"><img src="https://user-images.githubusercontent.com/50096655/121306020-51f10180-c939-11eb-9637-4ddcad5e5032.gif"></img></p>
-
 
 
 
@@ -29,8 +27,6 @@
 * 지니 앨범 링크로 앨범 표지,곡 정보 받아오기
 * 좋아요 따봉 표시
 * 자신이 추가 한 앨범만 삭제 가능하게 제한
-
-<p align="center"><img src="https://user-images.githubusercontent.com/50096655/121307007-77cad600-c93a-11eb-99e3-b27cc6ab60d3.gif"></img></p>
 
 
 ### [ 메인 페이지 ]
