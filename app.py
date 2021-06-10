@@ -173,7 +173,6 @@ def like_music():
 
 @app.route('/api/delete_music', methods=['POST'])
 def delete_music():
-    # 단어 삭제하기
 
 
     target_music = int(request.form['index_give'])

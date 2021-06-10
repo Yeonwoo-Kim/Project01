@@ -284,12 +284,12 @@
     function delete_music(obj) {
 
         if (confirm("해당 곡을 삭제하시겠어요?")) {
-            let my_album = obj
+            let index = obj
             $.ajax({
                 type: "POST",
                 url: `/api/delete_music`,
                 data: {
-                    album_give: my_album,
+                    index_give: index,
                 },
                 success: function (response) {
                     // alert("해당 곡을 삭제하시겠어요?")
